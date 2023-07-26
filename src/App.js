@@ -1,75 +1,47 @@
+import { Route, Routes } from "react-router";
 import "./App.css";
-import { Routes, Route, useLocation } from "react-router-dom";
-import { Footer, Header, RestrictRoute } from "components";
-import {
-  Cart,
-  Home,
-  NotFound,
-  Products,
-  SignIn,
-  SignUp,
-  WishList,
-} from "pages";
-import {
-  ROUTE_CART,
-  ROUTE_HOME,
-  ROUTE_PRODUCTS,
-  ROUTE_ROOT,
-  ROUTE_SIGN_IN,
-  ROUTE_SIGN_UP,
-  ROUTE_WISHLIST,
-} from "utils";
-import { ProductsProvider, useUser } from "context";
-
-// mockman-js
-import Mockman from "mockman-js";
+import { Home } from "./pages/home/home";
+import { Product } from "./pages/product/product";
+import Cart from "./pages/cart/cart";
+import { NavBar } from "./components/navbar/navbar";
+import { Wishlist } from "./pages/wishlist/wishlist";
+import { ProductDetails } from "./pages/productDetails/productDetails";
+import { Login } from "./pages/login/login";
+import { Signup } from "./pages/signup/signup";
+import { RequireAuth } from "./components/auth/requireAuth";
+import MockMan from "mockman-js";
+import { Address } from "./pages/address/address";
+import { OrderSummary } from "./pages/orderSummary/orderSummary";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { Profile } from "./pages/profile/profile";
+import { AddressDetails } from "./pages/profile/addressDetails";
+import { PageNotFound } from "./pages/404/pageNotFound";
 
 function App() {
-  const location = useLocation();
-  const { userState } = useUser();
-  const RestrictRouteList = [ROUTE_SIGN_IN, ROUTE_SIGN_UP];
-
   return (
-    <>
-      {userState.isUserAuthTokenExist &&
-      RestrictRouteList.includes(location.pathname) ? (
-        <></>
-      ) : (
-        <Header />
-      )}
-
+    <div className="App">
+      <NavBar />
+      
+      <ToastContainer position="bottom-right" autoClose={2000} />
       <Routes>
-        <Route path={ROUTE_ROOT} element={<Home />} />
-        <Route path={ROUTE_HOME} element={<Home />} />
-
-        <Route
-          path={ROUTE_PRODUCTS}
-          element={
-            <ProductsProvider>
-              <Products />
-            </ProductsProvider>
-          }
-        />
-
-        <Route element={<RestrictRoute />}>
-          <Route path={ROUTE_SIGN_IN} element={<SignIn />} />
-          <Route path={ROUTE_SIGN_UP} element={<SignUp />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/products" element={<Product />} />
+        <Route path="/products/:productID" element={<ProductDetails />} />
+        <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+        <Route element={<RequireAuth />}>
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/wishlist" element={<Wishlist />} />
+          <Route path='/address' element={<Address />} />
+          <Route path='/order-summary' element={<OrderSummary />} />
+          <Route path='/profile' element={<Profile />} />
+          <Route path='/address-details' element={<AddressDetails />} />
         </Route>
-
-        <Route path={ROUTE_WISHLIST} element={<WishList />} />
-        <Route path={ROUTE_CART} element={<Cart />} />
-        <Route path="*" element={<NotFound />} />
-
-        <Route path="/mockman-test" element={<Mockman />} />
+        <Route path="/mockman" element={<MockMan />} />
+        <Route path='*' element={<PageNotFound />} />
       </Routes>
-
-      {userState.isUserAuthTokenExist &&
-      RestrictRouteList.includes(location.pathname) ? (
-        <></>
-      ) : (
-        <Footer />
-      )}
-    </>
+    </div>
   );
 }
 

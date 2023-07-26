@@ -1,5 +1,11 @@
 import { Server, Model, RestSerializer } from "miragejs";
 import {
+  addNewAddressHandler,
+  getAllAddressesHandler,
+  editAddressHandler,
+  removeAddressHandler,
+} from "./backend/controllers/AddressController";
+import {
   loginHandler,
   signupHandler,
 } from "./backend/controllers/AuthController";
@@ -14,7 +20,6 @@ import {
   getCategoryHandler,
 } from "./backend/controllers/CategoryController";
 import {
-  getAllHomeProductsHandler,
   getAllProductsHandler,
   getProductHandler,
 } from "./backend/controllers/ProductController";
@@ -26,6 +31,7 @@ import {
 import { categories } from "./backend/db/categories";
 import { products } from "./backend/db/products";
 import { users } from "./backend/db/users";
+import { v4 as uuid } from "uuid";
 
 export function makeServer({ environment = "development" } = {}) {
   return new Server({
@@ -39,6 +45,7 @@ export function makeServer({ environment = "development" } = {}) {
       user: Model,
       cart: Model,
       wishlist: Model,
+      address: Model,
     },
 
     // Runs on the start of the server
@@ -50,7 +57,21 @@ export function makeServer({ environment = "development" } = {}) {
       });
 
       users.forEach((item) =>
-        server.create("user", { ...item, cart: [], wishlist: [] })
+        server.create("user", {
+          ...item,
+          cart: [],
+          wishlist: [],
+          address: [
+            {
+              _id: uuid(),
+              name: "Adarsh Balika",
+              street: "123, Adarsh Nagar",
+              city: "Balasore",
+              state: "Odisha",
+              pincode: "789654",
+            },
+          ],
+        })
       );
 
       categories.forEach((item) => server.create("category", { ...item }));
@@ -63,7 +84,6 @@ export function makeServer({ environment = "development" } = {}) {
       this.post("/auth/login", loginHandler.bind(this));
 
       // products routes (public)
-      this.get("/products/home", getAllHomeProductsHandler.bind(this));
       this.get("/products", getAllProductsHandler.bind(this));
       this.get("/products/:productId", getProductHandler.bind(this));
 
@@ -87,6 +107,12 @@ export function makeServer({ environment = "development" } = {}) {
         "/user/wishlist/:productId",
         removeItemFromWishlistHandler.bind(this)
       );
+
+      // address routes (private)
+      this.get("/user/address", getAllAddressesHandler.bind(this));
+      this.post("/user/address", addNewAddressHandler.bind(this));
+      this.post("/user/address/:addressId", editAddressHandler.bind(this));
+      this.delete("/user/address/:addressId", removeAddressHandler.bind(this));
     },
   });
 }

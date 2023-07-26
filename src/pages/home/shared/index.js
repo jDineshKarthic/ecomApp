@@ -1,1 +1,0 @@
-export { HomeHeading } from "./HomeHeading";
